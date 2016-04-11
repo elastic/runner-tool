@@ -1,5 +1,4 @@
 require_relative "base"
-
 require "net/ssh"
 
 module RunnerTool
@@ -7,9 +6,9 @@ module RunnerTool
     class Ssh < Base
 
       def sudo_exec!(cmd)
-        Command.new(host, cmd).tap do |cmd|
-          status = execute_cmd(cmd, :sudo => true)
-          cmd.update_status(status)
+        Command.new(host, cmd).tap do |_cmd|
+          status = execute_cmd(_cmd, :sudo => true)
+          _cmd.update_status(status)
         end
       end
 

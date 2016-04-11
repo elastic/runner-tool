@@ -1,6 +1,7 @@
 require "runner-tool/version"
 require "runner-tool/dsl"
 require "runner-tool/command"
+require "runner-tool/runners"
 
 include RunnerTool::DSL
 

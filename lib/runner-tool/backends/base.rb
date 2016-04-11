@@ -1,3 +1,5 @@
+require "runner-tool/command"
+
 module RunnerTool
   module Backends
     class Base
@@ -11,20 +13,20 @@ module RunnerTool
       def exec(host, &block)
         @host = host
         instance_exec(host, &block)
+        @host = nil
       end
 
       def upload!(cmd)
         puts "ssh.upload! #{cmd}"
       end
 
+      private
       def exec!(cmd)
-        Command.new(host, cmd).tap do |cmd|
-           status = execute_cmd(cmd)
-           cmd.update_status(status)
+        Command.new(host, cmd).tap do |_cmd|
+           status = execute_cmd(_cmd)
+           _cmd.update_status(status)
         end
       end
-
-      private
 
       def config
         RunnerTool.configuration
