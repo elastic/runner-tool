@@ -1,9 +1,17 @@
 require_relative "base"
 require "net/ssh"
+require "runner-tool/connection_pool"
 
 module RunnerTool
   module Backends
     class Ssh < Base
+
+      attr_reader :pool
+
+      def initialize(options={})
+        super(options)
+        @pool = ConnectionPool.new
+      end
 
       def sudo_exec!(cmd)
         Command.new(host, cmd).tap do |_cmd|
@@ -12,22 +20,32 @@ module RunnerTool
         end
       end
 
+      def close_connections
+        pool.close_all
+      end
+
       private
 
       def execute_cmd(cmd, options={})
         stdout, stderr, exit_status = "", "", -1
-        host, port = cmd.host.split(":")
-        Net::SSH.start(host, config.username, {:password => config.password, :port => port}) do |ssh|
-          command_string = command(cmd, options)
-          ssh.exec!(command_string) do |channel, stream, data|
-            stdout << data if stream == :stdout
-            stderr << data if stream == :stderr
-            channel.on_request("exit-status") do |ch, _data|
-              exit_status = _data.read_long
-            end
+
+        ssh_config = build_config_with(cmd)
+        connection = pool.start(ssh_config)
+
+        connection.exec!(command(cmd, options)) do |channel, stream, data|
+          stdout << data if stream == :stdout
+          stderr << data if stream == :stderr
+          channel.on_request("exit-status") do |ch, _data|
+            exit_status = _data.read_long
           end
         end
         { :stdout => stdout, :stderr => stderr, :exit_status => exit_status }
+      end
+
+      def build_config_with(cmd)
+        host, port = cmd.host.split(":")
+        { :host => host, :user => config.username,
+          :options => {:password => config.password, :port => port }}
       end
 
       def command(cmd, options={})

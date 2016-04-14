@@ -17,7 +17,7 @@ describe RunnerTool::Backends::Ssh do
 
   before(:each) do
     allow(ssh_connection).to receive(:exec!)
-    allow(Net::SSH).to receive(:start).and_yield(ssh_connection)
+    allow_any_instance_of(RunnerTool::ConnectionPool).to receive(:start).and_return(ssh_connection)
   end
 
   it "should call the exec method witht he right parameters" do

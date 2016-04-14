@@ -5,7 +5,6 @@ module RunnerTool
   module Backends
     class Local < Base
 
-
       private
 
       def execute_cmd(cmd)
