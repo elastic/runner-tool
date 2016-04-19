@@ -15,7 +15,6 @@ module RunnerTool
         hosts.each do |host|
           runner.exec(host, &block)
         end
-        runner.close_connections
       end
     end
   end

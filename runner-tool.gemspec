@@ -14,12 +14,12 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://www.purbon.com"
   spec.license       = "Apache License 2"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = Dir.glob(["runner-tool.gemspec", "lib/**/*.rb", "spec/**/*.rb"])
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "net-ssh", "~> 3.1", ">= 3.1.1"
+  spec.add_runtime_dependency "net-ssh", "~> 2.9", ">= 2.9.4"
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"

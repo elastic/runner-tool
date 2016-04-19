@@ -1,4 +1,5 @@
 require "net/ssh"
+require "singleton"
 
 module RunnerTool
 
@@ -26,6 +27,8 @@ module RunnerTool
   end
 
   class ConnectionPool
+
+    include Singleton
 
     def initialize
       @connections = {}

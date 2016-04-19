@@ -10,7 +10,7 @@ module RunnerTool
 
       def initialize(options={})
         super(options)
-        @pool = ConnectionPool.new
+        @pool = ConnectionPool.instance
       end
 
       def sudo_exec!(cmd)
@@ -20,10 +20,6 @@ module RunnerTool
         end
       end
 
-      def close_connections
-        pool.close_all
-      end
-
       private
 
       def execute_cmd(cmd, options={})
@@ -31,7 +27,6 @@ module RunnerTool
 
         ssh_config = build_config_with(cmd)
         connection = pool.start(ssh_config)
-
         connection.exec!(command(cmd, options)) do |channel, stream, data|
           stdout << data if stream == :stdout
           stderr << data if stream == :stderr
