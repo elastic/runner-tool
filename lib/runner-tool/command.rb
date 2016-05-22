@@ -11,7 +11,7 @@ module RunnerTool
     def update_status(status={})
       @stdout    = status[:stdout]
       @stderr    = status[:stderr]
-      @exit_code = status[:exit_status]
+      @exit_status = status[:exit_status]
       self
     end
 

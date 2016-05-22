@@ -12,9 +12,23 @@ module RunnerTool
     end
 
     def build
-      @conn ||= Net::SSH.start(config[:host],
-                               config[:user],
-                               config[:options])
+      @conn ||= connect
+      self
+    end
+
+    def exec!(cmd, &block)
+      retries = 0
+      begin
+        @conn.exec!(cmd, &block)
+      rescue Net::SSH::Disconnect => e
+        if retries < 5
+          retries = retries + 1
+          @conn = connect
+          retry
+        else
+          raise e
+        end
+      end
     end
 
     def close
@@ -23,6 +37,12 @@ module RunnerTool
 
     def uid
       config.hash
+    end
+
+    private
+
+    def connect
+      Net::SSH.start(config[:host], config[:user], config[:options])
     end
   end
 
