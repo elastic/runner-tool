@@ -21,19 +21,19 @@ module RunnerTool
         end
       end
 
-      def upload!(file)
+      def upload!(file, dst)
         Command.new(host, file).tap do |_cmd|
-         status = upload_file(_cmd)
+         status = upload_file(_cmd, dst)
          _cmd.update_status(status)
         end
       end
 
       private
 
-      def upload_file(cmd)
+      def upload_file(cmd, dst)
         host, port = cmd.host.split(":")
         Net::SCP.upload!(host, config.username,
-                         cmd.cmd, cmd.cmd,
+                         cmd.cmd, dst,
                          :ssh => { :password => config.password, :port => port })
         { :stdout => "Uploaded #{cmd.cmd} to #{host}", :stderr => "", :exit_status => 0 }
       end
