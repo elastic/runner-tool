@@ -1,5 +1,6 @@
 require_relative "base"
 require "net/ssh"
+require "net/scp"
 require "runner-tool/connection_pool"
 
 module RunnerTool
@@ -20,7 +21,23 @@ module RunnerTool
         end
       end
 
+      def upload!(file)
+        Command.new(host, file).tap do |_cmd|
+         status = upload_file(_cmd)
+         _cmd.update_status(status)
+        end
+      end
+
       private
+
+      def upload_file(cmd)
+        host, port = cmd.host.split(":")
+        Net::SCP.upload!(host, config.username,
+                         cmd.cmd, cmd.cmd,
+                         :ssh => { :password => config.password, :port => port })
+        { :stdout => "Uploaded #{cmd.cmd} to #{host}", :stderr => "", :exit_status => 0 }
+      end
+
 
       def execute_cmd(cmd, options={})
         stdout, stderr, exit_status = "", "", -1
